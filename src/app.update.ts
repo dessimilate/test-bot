@@ -13,21 +13,30 @@ import { MainService } from './services/main.service'
 import { StudentService } from './services/student.service'
 import { CLOSE } from './buttons/close/button-name'
 import { closeWindow } from './buttons/close/button'
+import { checkTest } from './utils/check-test'
+import { PrismaService } from './prisma.service'
 
 @Update()
 export class AppUpdate {
 	constructor(
 		private readonly mainService: MainService,
-		private readonly studentService: StudentService
+		private readonly studentService: StudentService,
+		private readonly prisma: PrismaService
 	) {}
 
 	@Start()
 	async startBot(@Ctx() ctx: Context) {
+		await this.mainService.updateUserInfo(ctx)
+
 		if ([SCENES_ID.TEST_SCENE].includes(ctx.session.__scenes.current)) {
 			ctx.session.__scenes.current = null
 		}
 
-		await this.mainService.updateUserInfo(ctx)
+		if (ctx.startPayload) {
+			await checkTest(ctx.startPayload, ctx, this.prisma)
+			return
+		}
+
 		await ctx.scene.enter(ctx.session.__scenes.current || SCENES_ID.MAIN_SCENE)
 	}
 
@@ -41,10 +50,10 @@ export class AppUpdate {
 		await this.mainService.changeName(ctx)
 	}
 
-	@InlineQuery(new RegExp(`^${BUTTON_NAMES_S.TAKE_THE_TEST.NAME}.*`))
-	async onTakeTheTest(@Ctx() ctx: Context) {
-		await this.studentService.onTakeTheTest(ctx)
-	}
+	// @InlineQuery(new RegExp(`^${BUTTON_NAMES_S.TAKE_THE_TEST.NAME}.*`))
+	// async onTakeTheTest(@Ctx() ctx: Context) {
+	// 	await this.studentService.onTakeTheTest(ctx)
+	// }
 
 	@Action(CLOSE)
 	async close(@Ctx() ctx: Context) {

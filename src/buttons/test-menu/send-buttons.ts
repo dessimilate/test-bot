@@ -1,6 +1,5 @@
-import { type Context } from '@/types/context.interface'
+import { IQuestion, type Context } from '@/types/context.interface'
 import { buttonsQuestions, buttonsResult } from './buttons'
-import { IQuestion } from '@/services/lecturer.service'
 
 const title = ({ question }: IQuestion) => [question].join('\n')
 

@@ -1,6 +1,7 @@
 import { type Context } from '@/types/context.interface'
 import { buttonsMain, buttonsViewTest } from './buttons'
 import { getDayInfo } from '@/utils/get-day-info'
+import { deepLink } from '@/constants/deep-link'
 
 const title = ({ session: { name } }: Context) =>
 	[
@@ -24,5 +25,5 @@ export const editLecturerMenu = async (ctx: Context) => {
 }
 
 export const sendViewTestMenu = async (ctx: Context, id: string) => {
-	await ctx.reply(id, buttonsViewTest(id))
+	await ctx.reply(`${deepLink}${id}`, buttonsViewTest(id))
 }

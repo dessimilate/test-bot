@@ -1,7 +1,6 @@
 import { Markup } from 'telegraf'
 import { BACK_BUTTON } from '@/constants/bot-commands'
-import { Context } from '@/types/context.interface'
-import { IQuestion } from '@/services/lecturer.service'
+import { Context, IQuestion } from '@/types/context.interface'
 
 const {
 	inlineKeyboard,

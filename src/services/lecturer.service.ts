@@ -4,7 +4,7 @@ import {
 	sendViewTestMenu
 } from '@/buttons/lecturer-menu/send-buttons'
 import { PrismaService } from '@/prisma.service'
-import { type Context } from '@/types/context.interface'
+import { IQuestion, type Context } from '@/types/context.interface'
 import { Injectable } from '@nestjs/common/decorators/core/injectable.decorator'
 import { InputJsonValue } from '@prisma/client/runtime/library'
 import axios from 'axios'
@@ -13,12 +13,6 @@ import { closeButton } from '@/buttons/close/button'
 import { createCanvas } from 'canvas'
 import { format } from 'date-fns'
 import { ru } from 'date-fns/locale'
-
-export interface IQuestion {
-	question: string
-	answers: string[]
-	correct: number
-}
 
 @Injectable()
 export class LecturerService {
@@ -97,17 +91,15 @@ export class LecturerService {
 		ctxCanvas.stroke()
 
 		stats.forEach((s, i) => {
-			const y = headerHeight + 30 + i * rowHeight // Расчёт Y координаты
+			const y = headerHeight + 30 + i * rowHeight
 			ctxCanvas.fillText(s.name, 10, y)
 			ctxCanvas.fillText(`${s.percentage}%`, 200, y)
 			ctxCanvas.fillText(`${s.correct}`, 320, y)
 			ctxCanvas.fillText(`${s.questionsNumber}`, 480, y)
 		})
 
-		// Генерация буфера
 		const buffer = canvas.toBuffer()
 
-		// Отправка изображения
 		await ctx.replyWithPhoto({ source: buffer })
 	}
 

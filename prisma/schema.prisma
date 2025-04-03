@@ -21,7 +21,12 @@ model Test {
 }
 
 model TestStats {
-  correct Int
+  isDone Boolean @default(false)
+
+  shuffledQuestions Json @map("shuffled_questions")
+
+  correct         Int @default(0)
+  questionsAmount Int
 
   test   Test   @relation(fields: [testId], references: [id])
   testId String

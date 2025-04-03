@@ -41,12 +41,12 @@ export class MainService {
 
 				await this.prisma.user.update({
 					where: { id },
-					data: { username }
+					data: { username:username||'' }
 				})
 			}
 		} else {
 			await this.prisma.user.create({
-				data: { id, username, name: '' }
+				data: { id, username:username||'', name: '' }
 			})
 		}
 	}

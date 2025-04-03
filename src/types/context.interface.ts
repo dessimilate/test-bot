@@ -1,5 +1,3 @@
-import { IQuestion } from '@/services/lecturer.service'
-import { Test } from '@prisma/client'
 import type {
 	Chat,
 	Document,
@@ -19,6 +17,13 @@ export enum Roles {
 	superAdmin = 'super admin'
 }
 
+export interface IQuestion {
+	question: string
+	answers: string[]
+	correct: number
+	chosenAnswer?: number
+}
+
 export type sessionType = {
 	user_id: number
 
@@ -33,12 +38,10 @@ export type sessionType = {
 	student_menu_id: number
 	lecturer_menu_id: number
 
-	test: {
-		id: string
-		questions: IQuestion[]
-		questions_number: number
-		correct: number
-	}
+	testId: string
+	questions: IQuestion[]
+	questionsAmount: number
+	correct: number
 
 	last_created_test_id: string
 }
@@ -84,4 +87,6 @@ export interface Context extends SceneContext {
 	}
 
 	match: string[]
+
+	startPayload: string
 }
