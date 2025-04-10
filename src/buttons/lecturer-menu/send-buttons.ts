@@ -25,5 +25,5 @@ export const editLecturerMenu = async (ctx: Context) => {
 }
 
 export const sendViewTestMenu = async (ctx: Context, id: string) => {
-	await ctx.reply(`${deepLink}${id}`, buttonsViewTest(id))
+	await ctx.reply(`${deepLink(ctx)}${id}`, buttonsViewTest(id))
 }

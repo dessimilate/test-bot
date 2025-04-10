@@ -20,12 +20,16 @@ import { PrismaService } from './prisma.service'
 export class AppUpdate {
 	constructor(
 		private readonly mainService: MainService,
-		private readonly studentService: StudentService,
+		private readonly lecturerService: LecturerService,
 		private readonly prisma: PrismaService
 	) {}
 
 	@Start()
 	async startBot(@Ctx() ctx: Context) {
+		try {
+			await ctx.deleteMessage(ctx.update.message.message_id)
+		} catch {}
+
 		await this.mainService.updateUserInfo(ctx)
 
 		if ([SCENES_ID.TEST_SCENE].includes(ctx.session.__scenes.current)) {
@@ -33,6 +37,14 @@ export class AppUpdate {
 		}
 
 		if (ctx.startPayload) {
+			if (ctx.startPayload.startsWith('test-')) {
+				await this.lecturerService.chosenTestStats(
+					ctx,
+					ctx.startPayload.slice('test-'.length)
+				)
+				return
+			}
+
 			await checkTest(ctx.startPayload, ctx, this.prisma)
 			return
 		}
@@ -49,11 +61,6 @@ export class AppUpdate {
 	async changeName(@Ctx() ctx: Context) {
 		await this.mainService.changeName(ctx)
 	}
-
-	// @InlineQuery(new RegExp(`^${BUTTON_NAMES_S.TAKE_THE_TEST.NAME}.*`))
-	// async onTakeTheTest(@Ctx() ctx: Context) {
-	// 	await this.studentService.onTakeTheTest(ctx)
-	// }
 
 	@Action(CLOSE)
 	async close(@Ctx() ctx: Context) {

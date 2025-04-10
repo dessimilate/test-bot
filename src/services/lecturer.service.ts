@@ -13,6 +13,8 @@ import { closeButton } from '@/buttons/close/button'
 import { createCanvas } from 'canvas'
 import { format } from 'date-fns'
 import { ru } from 'date-fns/locale'
+import { Test } from '@prisma/client'
+import { deepLink } from '@/constants/deep-link'
 
 @Injectable()
 export class LecturerService {
@@ -34,20 +36,8 @@ export class LecturerService {
 		await sendLecturerMenu(ctx)
 	}
 
-	async lastTestStats(ctx: Context) {
-		const lastTest = await this.prisma.test.findUnique({
-			where: { id: ctx.session.last_created_test_id },
-			select: {
-				testStats: { select: { correct: true, user: true } },
-				questions: true
-			}
-		})
-
-		if (!lastTest) {
-			return
-		}
-
-		const questions = lastTest.questions as unknown as IQuestion[]
+	async getTestStats(ctx: Context, test: any) {
+		const questions = test.questions as unknown as IQuestion[]
 
 		const questionsNumber = Math.round(questions.length / 2)
 
@@ -56,7 +46,7 @@ export class LecturerService {
 			percentage: number
 			questionsNumber: number
 			correct: number
-		}[] = lastTest.testStats.map(el => ({
+		}[] = test.testStats.map(el => ({
 			name: el.user.name,
 			correct: el.correct,
 			questionsNumber,
@@ -103,25 +93,76 @@ export class LecturerService {
 		await ctx.replyWithPhoto({ source: buffer })
 	}
 
+	async lastTestStats(ctx: Context) {
+		const lastTest = await this.prisma.test.findUnique({
+			where: { id: ctx.session.last_created_test_id },
+			select: {
+				testStats: { select: { correct: true, user: true } },
+				questions: true
+			}
+		})
+
+		if (!lastTest) {
+			return
+		}
+
+		await this.getTestStats(ctx, lastTest)
+	}
+
+	async chosenTestStats(ctx: Context, id: string) {
+		const test = await this.prisma.test.findUnique({
+			where: { id },
+			select: {
+				testStats: { select: { correct: true, user: true } },
+				questions: true
+			}
+		})
+
+		if (!test) {
+			return
+		}
+
+		await this.getTestStats(ctx, test)
+	}
+
 	async allTests(ctx: Context) {
 		const tests = await this.prisma.test.findMany({
 			where: { creatorId: ctx.from.id },
 			select: {
 				id: true,
 				createdAt: true,
-				testStats: true
+				testStats: { select: { user: true } }
 			}
 		})
 
 		for (const test of tests) {
-			const countStudents = test.testStats.length
-			// const lastNumber = countStudents % 10
+			const uniqueUsers = new Set(test.testStats.map(stat => stat.user.id))
+			const countStudents = uniqueUsers.size
+
+			const getStudentWord = (count: number) => {
+				const lastDigit = count % 10
+				const lastTwoDigits = count % 100
+
+				if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
+					return 'студентов'
+				}
+
+				if (lastDigit === 1) {
+					return 'студент'
+				}
+
+				if (lastDigit >= 2 && lastDigit <= 4) {
+					return 'студента'
+				}
+
+				return 'студентов'
+			}
 
 			await ctx.reply(
 				[
-					test.id,
 					format(test.createdAt, 'dd.MM HH:mm', { locale: ru }),
-					`прошли тест - ${countStudents} студент`
+					`${deepLink(ctx)}test-${test.id}`,
+					`прошли тест - ${countStudents} ${getStudentWord(countStudents)}`
 				].join('\n')
 			)
 		}

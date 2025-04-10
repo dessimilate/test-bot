@@ -43,6 +43,8 @@ export type sessionType = {
 	questionsAmount: number
 	correct: number
 
+	statId: string
+
 	last_created_test_id: string
 }
 

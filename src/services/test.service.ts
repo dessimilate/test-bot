@@ -11,20 +11,27 @@ export class TestService {
 
 	async testStart(ctx: Context) {
 		if (ctx.session.testId) {
-			const testStats = await this.prisma.testStats.findUnique({
+			const testStats = await this.prisma.testStats.findMany({
 				where: {
-					testId_userId: {
-						testId: ctx.session.testId,
-						userId: ctx.from.id
-					}
+					testId: ctx.session.testId,
+					userId: ctx.from.id
 				}
 			})
 
-			if (testStats) {
+			const isEveryDone = testStats.every(el => el.isDone)
+
+			if (!isEveryDone) {
+				await ctx.reply('завершите текущий тест')
+
+				const notDoneStat = testStats.find(el => !el.isDone)
+
 				ctx.session.questions = (
-					testStats.shuffledQuestions as unknown as IQuestion[]
+					notDoneStat.shuffledQuestions as unknown as IQuestion[]
 				).filter(el => !el.chosenAnswer)
+
 				ctx.session.questionsAmount = ctx.session.questions.length
+
+				ctx.session.statId = notDoneStat.id
 			} else {
 				const test = await this.prisma.test.findUnique({
 					where: { id: ctx.session.testId }
@@ -33,7 +40,7 @@ export class TestService {
 				const q = test.questions as unknown as IQuestion[]
 				const questions = shuffle(sampleSize(q, Math.round(q.length / 2)))
 
-				await this.prisma.testStats.create({
+				const newStat = await this.prisma.testStats.create({
 					data: {
 						shuffledQuestions: questions as any,
 						questionsAmount: questions.length,
@@ -42,6 +49,8 @@ export class TestService {
 					}
 				})
 
+				ctx.session.statId = newStat.id
+
 				ctx.session.questions = questions
 				ctx.session.questionsAmount = questions.length
 			}
@@ -49,6 +58,7 @@ export class TestService {
 			await this.getQuestion(ctx)
 		} else {
 			await ctx.reply('у вас нет запущенных тестов', closeButton())
+			await ctx.scene.leave()
 		}
 	}
 
@@ -62,9 +72,7 @@ export class TestService {
 		const question = ctx.session.questions.shift()
 
 		await this.prisma.testStats.update({
-			where: {
-				testId_userId: { testId: ctx.session.testId, userId: ctx.from.id }
-			},
+			where: { id: ctx.session.statId },
 			data: { correct: { increment: +answer + 1 === question.correct ? 1 : 0 } }
 		})
 
@@ -89,9 +97,7 @@ export class TestService {
 			await sendResultMenu(ctx, text)
 
 			await this.prisma.testStats.update({
-				where: {
-					testId_userId: { testId: ctx.session.testId, userId: ctx.from.id }
-				},
+				where: { id: ctx.session.statId },
 				data: { isDone: true }
 			})
 

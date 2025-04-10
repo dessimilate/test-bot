@@ -1,1 +1,3 @@
-export const deepLink = 'https://t.me/almkai_test_bot?start='
+import { Context } from '@/types/context.interface'
+
+export const deepLink = (ctx: Context) => `https://t.me/${ctx.botInfo.username}?start=`

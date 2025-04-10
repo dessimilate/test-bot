@@ -1,13 +1,11 @@
-import { BUTTON_NAMES } from '@/buttons/student-menu/button-names'
 import { BACK_BUTTON } from '@/constants/bot-commands'
 import { SCENES_ID } from '@/constants/scenes'
 import { MainService } from '@/services/main.service'
 import { StudentService } from '@/services/student.service'
 import { type Context } from '@/types/context.interface'
 import { Injectable } from '@nestjs/common'
-import { Action, Ctx, Hears, InlineQuery, SceneEnter } from 'nestjs-telegraf'
+import { Action, Ctx, SceneEnter } from 'nestjs-telegraf'
 import { Scene } from 'nestjs-telegraf/dist/decorators/core/scene.decorator'
-import { BUTTON_NAMES as BUTTON_NAMES_S } from '@/buttons/student-menu/button-names'
 
 @Injectable()
 @Scene(SCENES_ID.STUDENT_SCENE)
