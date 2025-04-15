@@ -62,12 +62,12 @@ export class LecturerService {
 		const ctxCanvas = canvas.getContext('2d')
 
 		ctxCanvas.fillStyle = '#000000'
-		ctxCanvas.font = '20px Arial'
+		ctxCanvas.font = '20px "Times New Roman"'
 		ctxCanvas.textAlign = 'left'
 
 		ctxCanvas.fillText('Статистика студентов:', 10, 30)
 
-		ctxCanvas.font = '18px Arial'
+		ctxCanvas.font = '18px "Times New Roman"'
 		ctxCanvas.fillText('Имя', 10, headerHeight)
 		ctxCanvas.fillText('Процент', 200, headerHeight)
 		ctxCanvas.fillText('Правильных', 320, headerHeight)
