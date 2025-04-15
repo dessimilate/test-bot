@@ -94,6 +94,8 @@ export class LecturerService {
 	}
 
 	async lastTestStats(ctx: Context) {
+		if (!ctx.session.last_created_test_id) return
+
 		const lastTest = await this.prisma.test.findUnique({
 			where: { id: ctx.session.last_created_test_id },
 			select: {
@@ -102,9 +104,7 @@ export class LecturerService {
 			}
 		})
 
-		if (!lastTest) {
-			return
-		}
+		if (!lastTest) return
 
 		await this.getTestStats(ctx, lastTest)
 	}

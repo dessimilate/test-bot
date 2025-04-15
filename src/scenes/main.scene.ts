@@ -16,9 +16,9 @@ export class MainScene {
 		await this.mainService.getMainMenu(ctx)
 	}
 
-	@Action(BUTTON_NAMES.STUDENT.NAME)
+	@Action(BUTTON_NAMES.CONTINUE_TEST.NAME)
 	async studentScene(@Ctx() ctx: Context) {
-		await ctx.scene.enter(SCENES_ID.STUDENT_SCENE)
+		await ctx.scene.enter(SCENES_ID.TEST_SCENE)
 	}
 
 	@Action(BUTTON_NAMES.LECTURER.NAME)

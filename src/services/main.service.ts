@@ -21,7 +21,13 @@ export class MainService {
 		await sendMainMenu(ctx)
 	}
 
-	async updateUserInfo({ from: { id, username } }: Context) {
+	async updateUserInfo(ctx: Context) {
+		const {
+			from: { id, username, first_name, last_name }
+		} = ctx
+
+		if (!ctx.session.name) ctx.session.name = `${first_name} ${last_name}`
+
 		const user = await this.prisma.user.findUnique({
 			where: { id }
 		})
@@ -41,12 +47,12 @@ export class MainService {
 
 				await this.prisma.user.update({
 					where: { id },
-					data: { username:username||'' }
+					data: { username: username || '' }
 				})
 			}
 		} else {
 			await this.prisma.user.create({
-				data: { id, username:username||'', name: '' }
+				data: { id, username: username || '', name: '' }
 			})
 		}
 	}

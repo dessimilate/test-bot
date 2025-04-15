@@ -1,10 +1,15 @@
 export const BUTTON_NAMES = {
-	STUDENT: {
-		NAME: 'student',
-		TITLE: 'студент'
-	},
 	LECTURER: {
 		NAME: 'lecturer',
-		TITLE: 'преподаватель'
+		TITLE: 'Меню преподавателя'
+	},
+	CHANGE_NAME: {
+		NAME: 'имя ',
+		TITLE1: 'Ввести имя',
+		TITLE2: 'Изменить имя '
+	},
+	CONTINUE_TEST: {
+		NAME: 'continue-test',
+		TITLE: 'Продолжить тест'
 	}
 }
